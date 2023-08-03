@@ -1,12 +1,13 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField
 from django.contrib.auth.models import User
+from .models import CustomUser
 
 class RegistrationForm(UserCreationForm):
 
     class Meta:
-        model = User
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2']
+        model = CustomUser
+        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2', 'birth_year', 'address']
 
     first_name = forms.CharField(
         widget=forms.TextInput(
@@ -48,7 +49,7 @@ class RegistrationForm(UserCreationForm):
         widget=forms.PasswordInput(
             attrs={
                 'class': 'form-control form-control-lg',
-                'placeholder': '*********'
+                'placeholder': 'Password'
             }
         )
     )
@@ -57,7 +58,25 @@ class RegistrationForm(UserCreationForm):
         widget=forms.PasswordInput(
             attrs={
                 'class': 'form-control form-control-lg',
-                'placeholder': '*********'
+                'placeholder': 'Confirm Password'
+            }
+        )
+    )
+
+    birth_year = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control form-control lg',
+                'placeholder': 'Birth Year'
+            }
+        )
+    )
+
+    address = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control form-control-lg',
+                'placeholder': 'Address'
             }
         )
     )
@@ -79,7 +98,7 @@ class UserLoginForm(AuthenticationForm):
         widget=forms.PasswordInput(
             attrs={
                 'class': 'form-control form-control-lg',
-                'placeholder': '*********'
+                'placeholder': 'Password'
             }
         )
     )
