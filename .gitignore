@@ -1,1 +1,5 @@
+#Virtualenv
 senv
+
+#database
+db.sqlite3
