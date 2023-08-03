@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect
-from .forms import RegistrationForm
+from .forms import RegistrationForm, UserLoginForm
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.forms import AuthenticationForm
+# from django.contrib.auth.forms import AuthenticationForm
 
 # Create your views here.
 def index(request):
@@ -16,22 +16,23 @@ def register_user(request):
             return redirect('login')
     else:
         form = RegistrationForm()
-    return render(request, 'signup.html', {"form": form})
+    return render(request, 'register.html', {"form": form})
 
 
 def login_user(request):
     if request.method == "POST":
-        form = AuthenticationForm(request, data=request.POST)
+        form = UserLoginForm(request, data=request.POST)
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+            print(username, password)
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
                 return redirect('home')
             else:
                 pass
-    form = AuthenticationForm()
+    form = UserLoginForm()
     return render(request, 'login.html', {"form": form})
 
 def logout_user(request):
