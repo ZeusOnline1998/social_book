@@ -1,12 +1,28 @@
 from django.shortcuts import render, redirect
+
+from book.models import Book, CustomUser
 from .forms import RegistrationForm, UserLoginForm
 from django.contrib.auth import authenticate, login, logout
 # from django.contrib.auth.forms import AuthenticationForm
+from django.views.generic import ListView
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    authors = CustomUser.objects.filter(public_visibility=True)
+    book_count = Book.objects.select_related().count()
+    context = {
+        'authors': authors
+    }
+    return render(request, 'index.html', context=context)
 
+# class IndexView(ListView):
+#     model = CustomUser
+#     template_name = 'index.html'
+#     context_object_name = 'authors'
+    
+#     def get_queryset(self):
+#         return CustomUser.objects.filter(public_visibility=True)
+    
 
 def register_user(request):
     if request.method == "POST":
@@ -38,3 +54,5 @@ def login_user(request):
 def logout_user(request):
     logout(request)
     return redirect('home')
+
+# def 
