@@ -10,6 +10,6 @@ urlpatterns = [
     path('upload-book/', views.UploadBookView.as_view(), name='upload-book'),
     # path('upload-book/', views.upload_book, name='upload-book'),
     path('books-list/', views.BookListView.as_view(), name='books-list'),
-    path('book/<slug:slug>/', views.BookDetailView.as_view(), name='book-detail'),
-    path('author/<slug:slug>/', views.author_detail, name='author-detail'),
+    path('book/<int:pk>/', views.BookDetailView.as_view(), name='book-detail'),
+    path('author/<str:username>/', views.author_detail, name='author-detail'),
 ]

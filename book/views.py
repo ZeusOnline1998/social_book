@@ -6,14 +6,30 @@ from book.models import Book, CustomUser
 from .forms import BookForm, RegistrationForm, UserLoginForm
 from django.contrib.auth import authenticate, login, logout
 # from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.views.generic import ListView, FormView, CreateView, DetailView
+from sqlalchemy import create_engine, select
+from sqlalchemy.orm import sessionmaker
+
+# Create SQLAchemmy Engine
+def get_connection():
+
+    url = "postgresql://postgres:pass@localhost:5432/social_book"
+    engine = create_engine(url)
+    Session = sessionmaker(bind=engine)
+    return Session()
+
+# stmt = select(book_custom)
 
 # Create your views here.
+@login_required
 def index(request):
     authors = CustomUser.objects.filter(public_visibility=True)
-    book_count = Book.objects.select_related().count()
+    # book_count = Book.objects.select_related().count()
     context = {
-        'authors': authors
+        'authors': authors,
+        # 'book_count': book_count
     }
     return render(request, 'index.html', context=context)
 
@@ -56,6 +72,7 @@ def logout_user(request):
     logout(request)
     return redirect('home')
 
+@method_decorator(login_required, name='dispatch')
 class UploadBookView(CreateView):
     model = Book
     form_class = BookForm
@@ -77,6 +94,7 @@ class UploadBookView(CreateView):
 #     form = BookForm()
 #     return render(request, 'upload_book.html', {"form": form})
 
+@method_decorator(login_required, name='dispatch')
 class BookListView(ListView):
     model = Book
     template_name = 'book_list.html'
@@ -85,13 +103,14 @@ class BookListView(ListView):
     def get_queryset(self):
         return Book.objects.filter(visibility=True)
 
+@method_decorator(login_required, name='dispatch')
 class BookDetailView(DetailView):
     model = Book
     template_name = 'book_detail.html'
     context_object_name = 'book'
 
-def author_detail(request, slug):
-    author = CustomUser.objects.get(slug=slug)
+def author_detail(request, username):
+    author = CustomUser.objects.get(username=username)
     books = Book.objects.filter(author=author, visibility=True)
     context = {
         'author': author,
@@ -99,3 +118,10 @@ def author_detail(request, slug):
     }
     print(request.user)
     return render(request, 'author_detail.html', context)
+
+
+# def list_books(request):
+
+#     cur = get_connection()
+
+#     stmt = select(CustomUser).where(CustomUser.first_name == 'Amit')

@@ -6,6 +6,7 @@ from django.template.defaultfilters import slugify
 from django.urls import reverse
 import magic
 # Create your models here.
+
 class CustomUser(AbstractUser):
 
     objects = CustomUserManager()
@@ -15,7 +16,6 @@ class CustomUser(AbstractUser):
     address = models.CharField(max_length=255, null=True)
     birth_year = models.PositiveIntegerField(null=True)
     # age = models.PositiveIntegerField(null=True)
-    slug = models.SlugField(null=True, unique=True)
 
     # USERNAME_FIELD = 'email'
 
@@ -27,7 +27,7 @@ class CustomUser(AbstractUser):
             return 'Not Specified'
 
     def get_absolute_url(self):
-        return reverse("author-detail", kwargs={"slug": self.slug})
+        return reverse("author-detail", kwargs={"username": self.username})
 
     @property
     def get_fullname(self):
@@ -37,7 +37,7 @@ class CustomUser(AbstractUser):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f'{self.first_name} {self.last_name}')
+            self.slug = slugify(self.username)
         return super().save(*args, **kwargs)
 
 
@@ -50,18 +50,9 @@ class Book(models.Model):
     visibility = models.BooleanField()
     file = models.FileField(default=None, upload_to='files/')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
-    slug = models.SlugField(null=False, unique=True)
+    # slug = models.SlugField(null=False, unique=True)
     # file_type = models.CharField(default="pdf", max_length=50)
 
     def get_absolute_url(self):
-        return reverse("book-detail", kwargs={"slug": self.slug})
+        return reverse("book-detail", kwargs={"pk": self.id})
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        # f = self.file.read(500)
-        # self.file.seek(0)
-        # mime = magic.from_buffer(f, mime=True)
-        # if "image" in mime:
-        #     self.file_type = "image"
-        super().save(*args, **kwargs)
