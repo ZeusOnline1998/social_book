@@ -1,0 +1,44 @@
+{% extends 'base.html' %} {% block body %}
+
+<div class="page-header">
+  <div class="row">
+    <div class="col text-center">
+      <div class="title"><h4>Upload Book</h4></div>
+    </div>
+  </div>
+</div>
+<div class="pd-20 card-box mb-30">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="form-group">
+    <label>Book Title</label>
+    {{form.title}}
+  </div>
+  <div class="form-group">
+    <label>Book Description</label>
+    {{form.description}}
+  </div>
+  <div class="form-group">
+    <label>Cost</label>
+    {{form.cost}}
+  </div>
+  <div class="form-group">
+    <label>Published Date</label>
+    {{form.published_date}}
+  </div>
+  <div class="form-group">
+    <label>Visibility: </label>
+    {{form.visibility}}
+  </div>
+  <div class="form-group">
+    <label>Upload Image/PDF of book</label>
+    <div class="custom-file">
+        {{form.file}}
+    </div>
+  </div>
+  <div class="form-group">
+    <button type="submit" class="btn btn-primary btn-block">Upload</button>
+  </div>
+  </form>
+</div>
+{% endblock body %}

@@ -1,13 +1,23 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, UsernameField
-from django.contrib.auth.models import User
-from .models import CustomUser
+# from django.contrib.auth.models import User
+from .models import CustomUser, Book
 
 class RegistrationForm(UserCreationForm):
 
     class Meta:
         model = CustomUser
-        fields = ['first_name', 'last_name', 'username', 'email', 'password1', 'password2', 'birth_year', 'address']
+        fields = [
+            'first_name', 
+            'last_name', 
+            'username', 
+            'email', 
+            'password1', 
+            'password2', 
+            'birth_year', 
+            'address',
+            'public_visibility',
+        ]
 
     first_name = forms.CharField(
         widget=forms.TextInput(
@@ -99,6 +109,61 @@ class UserLoginForm(AuthenticationForm):
             attrs={
                 'class': 'form-control form-control-lg',
                 'placeholder': 'Password'
+            }
+        )
+    )
+
+
+class BookForm(forms.ModelForm):
+
+    class Meta:
+        model = Book
+        fields = [
+            'title', 
+            'description', 
+            'cost', 
+            'published_date', 
+            'visibility', 
+            'file'
+        ]
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control form-control-lg',
+            }
+        )
+    )
+
+    description = forms.CharField(
+        widget=forms.Textarea(
+            attrs={
+                'class': 'form-control form-control-lg',
+            }
+        )
+    )
+
+    cost = forms.IntegerField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control form-control-lg',
+            }
+        )
+    )
+
+    published_date = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control form-control-lg',
+            }
+        )
+    )
+
+    file = forms.FileField(
+        widget=forms.FileInput(
+            attrs={
+                'class': 'form-control-file form-control height-auto',
+                'accept': '.pdf, .jpeg, .jpg'
             }
         )
     )

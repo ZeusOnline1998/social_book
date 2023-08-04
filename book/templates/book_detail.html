@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="page-header">
+  <div class="row">
+    <div class="col text-center">
+      <div class="title"><h4>Book Detail</h4></div>
+    </div>
+  </div>
+</div>
+<div class="row">
+    <div class="col-sm-12 col-lg-6 col-md-12">
+        <img src="{{book.file.url}}" alt="">    
+    </div>
+    <div class="col-sm-12 col-lg-6 col-md-12">
+        <div class="card-box pd-20">
+            <h4 class="mb-20 pt-20">{{book.title}}</h4>
+            <p>{{book.description}}</p>
+            <h5 class="mb-20 pt-20">{{book.author.get_fullname}}</h5>
+            <div class="mb-20 pt-20">
+                Published Date: {{book.published_date}}
+            </div>
+            <div class="mb-20 pt-20">
+                Cost: <span class="price">{{book.cost}}</span>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock body %}

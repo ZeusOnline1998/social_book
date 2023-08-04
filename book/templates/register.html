@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'auth_base.html' %}
 
 {% block body %}
 	<body class="login-page">
@@ -92,6 +92,10 @@
 								<div class="input-group-append custom">
 									<span class="input-group-text"><i class="icon-copy dw dw-user1"></i></span>
 								</div>
+							</div>
+							<div class="input-group custom" style="margin-bottom: 15px">
+								<label for="" class="form-check-label mr-3">Public Visibility: </label>
+								{{form.public_visibility}}
 							</div>
 							{% comment %} <div class="row pb-30">
 								<div class="col-6">

@@ -4,6 +4,7 @@ from datetime import datetime
 from .managers import CustomUserManager
 from django.template.defaultfilters import slugify
 from django.urls import reverse
+import magic
 # Create your models here.
 class CustomUser(AbstractUser):
 
@@ -25,8 +26,14 @@ class CustomUser(AbstractUser):
         else:
             return 'Not Specified'
 
-    # def get_absolute_url(self):
-    #     return reverse("members", kwargs={"slug": self.slug})
+    def get_absolute_url(self):
+        return reverse("author-detail", kwargs={"slug": self.slug})
+
+    @property
+    def get_fullname(self):
+        if not self.first_name:
+            return 'Author Unspecified'
+        return f'{self.first_name} {self.last_name}'
 
     def save(self, *args, **kwargs):
         if not self.slug:
@@ -41,15 +48,20 @@ class Book(models.Model):
     cost = models.PositiveIntegerField()
     published_date = models.PositiveIntegerField()
     visibility = models.BooleanField()
-    file = models.FileField(upload_to='files/')
+    file = models.FileField(default=None, upload_to='files/')
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     slug = models.SlugField(null=False, unique=True)
+    # file_type = models.CharField(default="pdf", max_length=50)
 
     def get_absolute_url(self):
-        # return reverse("model_detail", kwargs={"pk": self.pk})
-        pass
+        return reverse("book-detail", kwargs={"slug": self.slug})
 
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(self.title)
+        # f = self.file.read(500)
+        # self.file.seek(0)
+        # mime = magic.from_buffer(f, mime=True)
+        # if "image" in mime:
+        #     self.file_type = "image"
         super().save(*args, **kwargs)

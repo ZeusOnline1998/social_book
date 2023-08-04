@@ -1,10 +1,12 @@
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render, redirect
-
+from django.urls import reverse_lazy
 from book.models import Book, CustomUser
-from .forms import RegistrationForm, UserLoginForm
+from .forms import BookForm, RegistrationForm, UserLoginForm
 from django.contrib.auth import authenticate, login, logout
 # from django.contrib.auth.forms import AuthenticationForm
-from django.views.generic import ListView
+from django.views.generic import ListView, FormView, CreateView, DetailView
 
 # Create your views here.
 def index(request):
@@ -19,10 +21,9 @@ def index(request):
 #     model = CustomUser
 #     template_name = 'index.html'
 #     context_object_name = 'authors'
-    
 #     def get_queryset(self):
 #         return CustomUser.objects.filter(public_visibility=True)
-    
+
 
 def register_user(request):
     if request.method == "POST":
@@ -55,4 +56,46 @@ def logout_user(request):
     logout(request)
     return redirect('home')
 
-# def 
+class UploadBookView(CreateView):
+    model = Book
+    form_class = BookForm
+    success_url = reverse_lazy('home')
+    template_name = 'book_form.html'
+
+    def form_valid(self, form):
+        form.instance.author = self.request.user
+        form.save()
+        return super().form_valid(form)
+
+# def upload_book(request):
+#     if request.method == 'POST':
+#         form = BookForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             form.instance.author = request.user
+#             form.save()
+#             return redirect('home')
+#     form = BookForm()
+#     return render(request, 'upload_book.html', {"form": form})
+
+class BookListView(ListView):
+    model = Book
+    template_name = 'book_list.html'
+    context_object_name = 'books'
+
+    def get_queryset(self):
+        return Book.objects.filter(visibility=True)
+
+class BookDetailView(DetailView):
+    model = Book
+    template_name = 'book_detail.html'
+    context_object_name = 'book'
+
+def author_detail(request, slug):
+    author = CustomUser.objects.get(slug=slug)
+    books = Book.objects.filter(author=author)
+    context = {
+        'author': author,
+        'books': books
+    }
+    print(request.user)
+    return render(request, 'author_detail.html', context)

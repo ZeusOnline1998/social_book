@@ -1,29 +1,35 @@
-{% extends 'base.html' %} {% block body %}
-<div class="page-header">
-  <div class="row">
-    <div class="col text-center">
-      <div class="title"><h4>Authors</h4></div>
+{% extends 'base.html' %}
+
+{% block body %}
+<div class="card-box pd-20 mb-30">
+    <h3 class="mb-20 pt-20">{{author.get_fullname}}</h3>
+    <div class="mb-20 pt-20">
+        Email: <a href="mailto:{{author.email}}">
+        {{author.email}}</a>    
     </div>
-  </div>
+    <div class="mb-20 pt-20">
+        Address: {{author.address}}
+    </div>
+    <div class="mb-20 pt-20">Birth Year: {{author.birth_year}}</div>
 </div>
 <div>
   <div class="pd-20 card-box mb-30">
     <div class="col-md-12 col-sm-12">
-      {% if authors %}
+      {% if books %}
       <table class="table">
         <tr>
-          <th>First Name</th>
-          <th>Last Name</th>
-          <th>Age</th>
+          <th>Title</th>
+          <th>Published Date</th>
+          <th>Cost</th>
           {% comment %}
           <th>Books Published</th>
           {% endcomment %}
         </tr>
-        {% for author in authors %}
+        {% for book in books %}
         <tr>
-          <td><a href="{{author.get_absolute_url}}" style="display: block">{{author.first_name}}</a></td>
-          <td><a href="{{author.get_absolute_url}}">{{author.last_name}}</a></td>
-          <td><a href="{{author.get_absolute_url}}">{{author.age}}</a></td>
+          <td><a href="{{book.get_absolute_url}}" style="display: block">{{book.title}}</a></td>
+          <td><a href="{{book.get_absolute_url}}">{{book.published_date}}</a></td>
+          <td><a href="{{book.get_absolute_url}}">{{book.cost}}</a></td>
         </tr>
         {% endfor %}
       </table>
@@ -57,4 +63,4 @@
     {% endcomment %}
   </div>
 </div>
-{% endblock %}
+{% endblock body %}
