@@ -59,7 +59,7 @@ def logout_user(request):
 class UploadBookView(CreateView):
     model = Book
     form_class = BookForm
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('books-list')
     template_name = 'book_form.html'
 
     def form_valid(self, form):
@@ -92,7 +92,7 @@ class BookDetailView(DetailView):
 
 def author_detail(request, slug):
     author = CustomUser.objects.get(slug=slug)
-    books = Book.objects.filter(author=author)
+    books = Book.objects.filter(author=author, visibility=True)
     context = {
         'author': author,
         'books': books

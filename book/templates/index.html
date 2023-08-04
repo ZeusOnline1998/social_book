@@ -21,7 +21,7 @@
         </tr>
         {% for author in authors %}
         <tr>
-          <td><a href="{{author.get_absolute_url}}" style="display: block">{{author.first_name}}</a></td>
+          <td><a href="{{author.get_absolute_url}}">{{author.first_name}}</a></td>
           <td><a href="{{author.get_absolute_url}}">{{author.last_name}}</a></td>
           <td><a href="{{author.get_absolute_url}}">{{author.age}}</a></td>
         </tr>

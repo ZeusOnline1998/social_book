@@ -290,6 +290,7 @@
 						</a>
 						<ul class="submenu">
 							<li><a href="{% url 'books-list' %}">Books List</a></li>
+							<li><a href="{% url 'upload-book' %}">Add Book</a></li>
 							{% comment %} <li><a href="advanced-components.html">Advanced Components</a></li>
 							<li><a href="form-wizard.html">Form Wizard</a></li>
 							<li><a href="html5-editor.html">HTML5 Editor</a></li>
@@ -298,7 +299,7 @@
 							<li><a href="image-dropzone.html">Image Dropzone</a></li> {% endcomment %}
 						</ul>
 					</li>
-					<li class="dropdown">
+					{% comment %} <li class="dropdown">
 						<a href="javascript:;" class="dropdown-toggle">
 							<span class="micon dw dw-library"></span><span class="mtext">Tables</span>
 						</a>
@@ -456,7 +457,7 @@
 							<span class="micon dw dw-paper-plane1"></span>
 							<span class="mtext">Landing Page <img src="/media/images/coming-soon.png" alt="" width="25"></span>
 						</a>
-					</li>
+					</li> {% endcomment %}
 				</ul>
 			</div>
 		</div>
