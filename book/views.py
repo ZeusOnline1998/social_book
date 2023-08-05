@@ -11,6 +11,20 @@ from django.utils.decorators import method_decorator
 from django.views.generic import ListView, FormView, CreateView, DetailView
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
+from .wrappers import file_upload_check
+from rest_framework.authtoken.models import Token
+from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView
+from rest_framework.decorators import permission_classes, authentication_classes
+from djoser.views import TokenCreateView, TokenDestroyView
+# from django.views.generic import TemplateView
+from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.renderers import TemplateHTMLRenderer
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib import messages
 
 # Create SQLAchemmy Engine
 def get_connection():
@@ -58,18 +72,48 @@ def login_user(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            print(username, password)
             user = authenticate(username=username, password=password)
+            # token = Token.objects.get_or_create(user=user)
+            create_token = TokenCreateView.as_view()
+            token = create_token(request)
+            print(token)
             if user is not None:
                 login(request, user)
+                messages.success(request, f"Welcome {request.user.first_name}!")
                 return redirect('home')
             else:
+                messages.error(request, "Invalid Credentials, Please try again")
                 pass
     form = UserLoginForm()
     return render(request, 'login.html', {"form": form})
 
+# class LoginAPI(CreateAPIView):
+#     template_name = 'api_login.html'
+#     renderer_classes = [TemplateHTMLRenderer]
+
+#     # def get(self, request):
+#     #     return Response({"data": "hello world"})
+#     #     print("Here")
+
+#     def post(self, request):
+#         print("Here")
+#         username = request.POST['id_username']
+#         password = request.POST['id_password']
+#         user = authenticate(username=username, password=password)
+#         if user is not None:
+#             token = Token.objects.get_or_create(user=user)
+#             login(request, user)
+#             return redirect('home')
+
+@login_required
 def logout_user(request):
+    # token = Token.objects.get(user=request.user)
+    destroy_token = TokenDestroyView.as_view()
+    token = destroy_token(request)
+    print(token)
+    # print(token)
     logout(request)
+    # token.delete()
     return redirect('home')
 
 @method_decorator(login_required, name='dispatch')
@@ -82,6 +126,7 @@ class UploadBookView(CreateView):
     def form_valid(self, form):
         form.instance.author = self.request.user
         form.save()
+        messages.success(self.request, "Your book has been uploaded")
         return super().form_valid(form)
 
 # def upload_book(request):
@@ -94,7 +139,7 @@ class UploadBookView(CreateView):
 #     form = BookForm()
 #     return render(request, 'upload_book.html', {"form": form})
 
-@method_decorator(login_required(redirect_field_name='books-list'), name='dispatch')
+@method_decorator([login_required(redirect_field_name='books-list'), file_upload_check], name='dispatch')
 class BookListView(ListView):
     model = Book
     template_name = 'book_list.html'
@@ -102,26 +147,52 @@ class BookListView(ListView):
 
     def get_queryset(self):
         return Book.objects.filter(visibility=True)
-
 @method_decorator(login_required, name='dispatch')
 class BookDetailView(DetailView):
     model = Book
     template_name = 'book_detail.html'
     context_object_name = 'book'
 
+from .serializers import BookSerializer
+# from django.http import JsonResponse
+class BookDetailAPI(APIView):
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+    permission_classes = [IsAuthenticated]
+    model = Book
+    serializer_class = BookSerializer
+    template_name = 'api_book_detail.html'
+    renderer_classes = [TemplateHTMLRenderer]
+
+    def get(self, request, pk):
+        queryset = Book.objects.get(pk=pk)
+        print(queryset)
+        return Response({"book": queryset})
+
 def author_detail(request, username):
     author = CustomUser.objects.get(username=username)
-    books = Book.objects.filter(author=author, visibility=True)
+    if request.user == author:
+        books = Book.objects.filter(author=author)
+    else:
+        books = Book.objects.filter(author=author, visibility=True)
     context = {
         'author': author,
         'books': books
     }
-    print(request.user)
+    # print(request.user)
     return render(request, 'author_detail.html', context)
 
 
-# def list_books(request):
+def send_details(request):
+    user = CustomUser.objects.get(username=request.user.username)
 
-#     cur = get_connection()
+    subject = "Request for details - Social Book"
+    message = f'Here is your information you requested from our website\nName: {user.get_fullname} \nUsername: {user.username} \nEmail: {user.email} \nAddress: {user.address} \n'
+    from_email = settings.EMAIL_HOST_USER
+    to_email = user.email
+    try:
+        send_mail(subject, message, from_email, recipient_list=[to_email])
+        messages.success(request, "Your details have been sent check your email")
+    except Exception:
+        messages.error(request, "Error sending email try again later")
+    return redirect('home')
 
-#     stmt = select(CustomUser).where(CustomUser.first_name == 'Amit')

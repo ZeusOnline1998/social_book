@@ -1,3 +1,4 @@
+{% load rest_framework %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -31,6 +32,7 @@
 
 		gtag('config', 'UA-119386393-1');
 	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.0/jquery.min.js"></script>
 </head>
 <body>
 	<!-- <div class="pre-loader">
@@ -164,7 +166,9 @@
 						{% comment %} <a class="dropdown-item" href="profile.html"><i class="dw dw-user1"></i> Profile</a> {% endcomment %}
 						{% comment %} <a class="dropdown-item" href="profile.html"><i class="dw dw-settings2"></i> Setting</a> {% endcomment %}
 						{% comment %} <a class="dropdown-item" href="faq.html"><i class="dw dw-help"></i> Help</a> {% endcomment %}
-						<a class="dropdown-item" href="{% url 'logout' %}"><i class="dw dw-logout"></i> Log Out</a>
+						<a class="dropdown-item" href="{% url 'author-detail' username=request.user.username %}"><i class="dw"></i>My Profile</a>
+						<a class="dropdown-item" href="{% url 'send-details' %}"><i class="dw"></i>Send Profile Details</a>
+						<a class="dropdown-item" href="{% url 'my_logout' %}"><i class="dw dw-logout"></i> Log Out</a>
 					</div>
 				</div>
 				{% else %}
@@ -466,7 +470,25 @@
     <div class="main-container">
 		<div class="pd-ltr-20 xs-pd-20-10">
 			<div class="min-height-200px">
-				
+				{% if messages %}
+					{% for message in messages %}
+						{% if message.tags == 'success' %}
+							<div class="alert alert-success alert-dismissible fade show" role="alert">
+  								<strong>{{message}}</strong>
+  								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    							<span aria-hidden="true">&times;</span>
+  							</button>
+							</div>
+						{% else %}
+							<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  								<strong>{{message}}</strong>
+  								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    							<span aria-hidden="true">&times;</span>
+  							</button>
+							</div>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
 				{% block body %}{% endblock body %}
 				
 				</div>

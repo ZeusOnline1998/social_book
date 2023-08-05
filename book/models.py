@@ -54,5 +54,4 @@ class Book(models.Model):
     # file_type = models.CharField(default="pdf", max_length=50)
 
     def get_absolute_url(self):
-        return reverse("book-detail", kwargs={"pk": self.id})
-
+        return reverse("book-detail-api", kwargs={"pk": self.id})  # type: ignore
