@@ -94,7 +94,7 @@ class UploadBookView(CreateView):
 #     form = BookForm()
 #     return render(request, 'upload_book.html', {"form": form})
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required(redirect_field_name='books-list'), name='dispatch')
 class BookListView(ListView):
     model = Book
     template_name = 'book_list.html'
