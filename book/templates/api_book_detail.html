@@ -21,9 +21,24 @@
                 Published Date: {{book.published_date}}
             </div>
             <div class="mb-20 pt-20">
-                Cost: <span class="price">{{book.cost}}</span>
+                Cost: <span class="price">&#8377; {{book.cost}}</span>
             </div>
-
+            {% if book.author == request.user %}
+            <div class="mb-20 pt-20">
+                Visibile For Public: 
+                {% if book.visibility == True %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}
+            </div>
+            {% endif %}
+            <div class="mb-20 pt-20">
+              <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary rounded-pill">Send book details</button>
+              </form>
+            </div>
         </div>
     </div>
 </div>

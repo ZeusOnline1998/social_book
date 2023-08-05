@@ -33,6 +33,25 @@
 		gtag('config', 'UA-119386393-1');
 	</script>
 </head>
+{% if messages %}
+					{% for message in messages %}
+						{% if message.tags == 'success' %}
+							<div class="alert alert-success alert-dismissible fade show" role="alert">
+  								<strong>{{message}}</strong>
+  								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    							<span aria-hidden="true">&times;</span>
+  							</button>
+							</div>
+						{% else %}
+							<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  								<strong>{{message}}</strong>
+  								<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    							<span aria-hidden="true">&times;</span>
+  							</button>
+							</div>
+						{% endif %}
+					{% endfor %}
+				{% endif %}
 	{% block body %}{% endblock body %}
 	<!-- js -->
 	<script src="{% static 'js/core.js' %}"></script>

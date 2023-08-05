@@ -25,7 +25,8 @@ from rest_framework.renderers import TemplateHTMLRenderer
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
-
+import string
+import random
 # Create SQLAchemmy Engine
 def get_connection():
 
@@ -39,7 +40,7 @@ def get_connection():
 # Create your views here.
 @login_required
 def index(request):
-    authors = CustomUser.objects.filter(public_visibility=True)
+    authors = CustomUser.objects.filter(public_visibility=True).order_by('id')
     # book_count = Book.objects.select_related().count()
     context = {
         'authors': authors,
@@ -79,7 +80,7 @@ def login_user(request):
             print(token)
             if user is not None:
                 login(request, user)
-                messages.success(request, f"Welcome {request.user.first_name}!")
+                messages.success(request, f"Welcome {request.user.get_fullname}!")
                 return redirect('home')
             else:
                 messages.error(request, "Invalid Credentials, Please try again")
@@ -107,13 +108,13 @@ def login_user(request):
 
 @login_required
 def logout_user(request):
-    # token = Token.objects.get(user=request.user)
-    destroy_token = TokenDestroyView.as_view()
-    token = destroy_token(request)
+    token = Token.objects.get(user=request.user)
+    # destroy_token = TokenDestroyView.as_view()
+    # token = destroy_token(request)
     print(token)
     # print(token)
     logout(request)
-    # token.delete()
+    token.delete()
     return redirect('home')
 
 @method_decorator(login_required, name='dispatch')
@@ -168,6 +169,20 @@ class BookDetailAPI(APIView):
         print(queryset)
         return Response({"book": queryset})
 
+    def post(self, request, pk):
+        book = Book.objects.get(pk=pk)
+        subject = f"Request for details of {book.title} - Social Book"
+        message = f'Here is your requested information\nBook Name: {book.title}\nDescription: {book.description}\nAuthor: {book.author.get_fullname}\nPublished Date: {book.published_date}\nCost: {book.cost}'
+        from_email = settings.EMAIL_HOST_USER
+        to_email = [request.user.email]
+        try:
+            send_mail(subject, message, from_email, recipient_list=to_email)
+            messages.success(request, "Book details been sent, check your email")
+        except Exception:
+            messages.error(request, "Error sending email try again later")
+        return redirect('book-detail-api', pk=book.pk)
+
+
 def author_detail(request, username):
     author = CustomUser.objects.get(username=username)
     if request.user == author:
@@ -191,8 +206,13 @@ def send_details(request):
     to_email = user.email
     try:
         send_mail(subject, message, from_email, recipient_list=[to_email])
-        messages.success(request, "Your details have been sent check your email")
+        messages.success(request, "Your details have been sent, check your email")
     except Exception:
         messages.error(request, "Error sending email try again later")
     return redirect('home')
 
+def generate():
+    digits = string.digits
+    two_fa = ''
+    for _ in range(6):
+        two_fa += random.choice(digits)
