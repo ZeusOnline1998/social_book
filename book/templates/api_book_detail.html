@@ -24,13 +24,20 @@
                 Cost: <span class="price">&#8377; {{book.cost}}</span>
             </div>
             {% if book.author == request.user %}
-            <div class="mb-20 pt-20">
-                Visibile For Public: 
+            <div class="mb-20 pt-20 row">
+                <div class="col">
+                  Visibile For Public: 
                 {% if book.visibility == True %}
                   Yes
                 {% else %}
                   No
                 {% endif %}
+                </div>
+                <div class="col">
+                  <form action="{% url 'change-book-visibility' pk=book.pk %}" method="post" class="no-padding">
+                  <button type="submit" class="btn btn-primary rounded-pill">Change</button>
+                </form>
+                </div>
             </div>
             {% endif %}
             <div class="mb-20 pt-20">

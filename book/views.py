@@ -8,6 +8,7 @@ from django.contrib.auth import authenticate, login, logout
 # from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
 from django.views.generic import ListView, FormView, CreateView, DetailView
 from sqlalchemy import create_engine, select
 from sqlalchemy.orm import sessionmaker
@@ -84,7 +85,6 @@ def login_user(request):
                 return redirect('home')
             else:
                 messages.error(request, "Invalid Credentials, Please try again")
-                pass
     form = UserLoginForm()
     return render(request, 'login.html', {"form": form})
 
@@ -182,6 +182,16 @@ class BookDetailAPI(APIView):
             messages.error(request, "Error sending email try again later")
         return redirect('book-detail-api', pk=book.pk)
 
+@csrf_exempt
+def change_book_visibility(request, pk):
+    book = Book.objects.get(pk=pk)
+    if book.visibility:
+        book.visibility = False
+    else:
+        book.visibility = True
+    book.save()
+    return redirect('book-detail-api', pk=book.pk)
+
 
 def author_detail(request, username):
     author = CustomUser.objects.get(username=username)
@@ -196,6 +206,15 @@ def author_detail(request, username):
     # print(request.user)
     return render(request, 'author_detail.html', context)
 
+@csrf_exempt
+def change_author_visibililty(request, pk):
+    author = CustomUser.objects.get(pk=pk)
+    if author.public_visibility:
+        author.public_visibility = False
+    else:
+        author.public_visibility = True
+    author.save()
+    return redirect('author-detail', username=author.username)
 
 def send_details(request):
     user = CustomUser.objects.get(username=request.user.username)
@@ -211,8 +230,10 @@ def send_details(request):
         messages.error(request, "Error sending email try again later")
     return redirect('home')
 
-def generate():
+from django.http import HttpResponse
+def generate_2fa():
     digits = string.digits
     two_fa = ''
     for _ in range(6):
         two_fa += random.choice(digits)
+    return two_fa

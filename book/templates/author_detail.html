@@ -11,6 +11,25 @@
         Address: {{author.address}}
     </div>
     <div class="mb-20 pt-20">Birth Year: {{author.birth_year}}</div>
+    {% if author == request.user %}
+      <div class="mb-20 pt-20">
+        <div class="row">
+          <div class="col-3">
+             Visibile For Public: 
+                {% if author.public_visibility == True %}
+                  Yes
+                {% else %}
+                  No
+                {% endif %}
+          </div>
+          <div class="col-3">
+            <form action="{% url 'change-author-visibility' pk=author.pk %}" method="post">
+              <button type="submit" class="btn btn-primary">Change</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    {% endif %}
 </div>
 <div>
   <div class="pd-20 card-box mb-30">
@@ -18,18 +37,32 @@
       {% if books %}
       <table class="table">
         <tr>
+          <th>Sr No</th>
           <th>Title</th>
           <th>Published Date</th>
           <th>Cost</th>
+          {% if author == request.user %}
+            <th>Visibile For Public</th>
+          {% endif %}
           {% comment %}
           <th>Books Published</th>
           {% endcomment %}
         </tr>
         {% for book in books %}
         <tr>
+          <td><a href="{{book.get_absolute_url}}" style="display: block">{{forloop.counter}}</a></td>
           <td><a href="{{book.get_absolute_url}}" style="display: block">{{book.title}}</a></td>
           <td><a href="{{book.get_absolute_url}}">{{book.published_date}}</a></td>
           <td><a href="{{book.get_absolute_url}}">{{book.cost}}</a></td>
+          {% if author == request.user %}
+            <td><a href="{{book.get_absolute_url}}">
+              {% if book.visibility == True %}
+                Yes
+              {% else %}
+                No
+              {% endif %}
+            </a></td>
+          {% endif %}
         </tr>
         {% endfor %}
       </table>

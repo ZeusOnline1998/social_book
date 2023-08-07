@@ -11,6 +11,7 @@
       {% if books %}
       <table class="table">
         <tr>
+          <th>Sr No.</th>
           <th>Title</th>
           <th>Author</th>
           <th>Published Date</th>
@@ -20,6 +21,7 @@
         </tr>
         {% for book in books %}
         <tr>
+          <td><a href="{{book.get_absolute_url}}">{{forloop.counter}}</a></td>
           <td><a href="{{book.get_absolute_url}}">{{book.title}}</a></td>
           <td><a href="{{book.get_absolute_url}}">{{book.author.get_fullname}}</a></td>
           <td><a href="{{book.get_absolute_url}}">{{book.published_date}}</a></td>
