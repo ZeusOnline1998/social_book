@@ -16,7 +16,7 @@ from .wrappers import file_upload_check
 from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.generics import CreateAPIView
-from rest_framework.decorators import permission_classes, authentication_classes
+from rest_framework.decorators import permission_classes, authentication_classes, renderer_classes, api_view
 from djoser.views import TokenCreateView, TokenDestroyView
 # from django.views.generic import TemplateView
 from rest_framework.authentication import TokenAuthentication, SessionAuthentication
@@ -88,6 +88,8 @@ def login_user(request):
     form = UserLoginForm()
     return render(request, 'login.html', {"form": form})
 
+
+
 # class LoginAPI(CreateAPIView):
 #     template_name = 'api_login.html'
 #     renderer_classes = [TemplateHTMLRenderer]
@@ -154,22 +156,44 @@ class BookDetailView(DetailView):
     template_name = 'book_detail.html'
     context_object_name = 'book'
 
-from .serializers import BookSerializer
-# from django.http import JsonResponse
-class BookDetailAPI(APIView):
-    authentication_classes = [TokenAuthentication, SessionAuthentication]
-    permission_classes = [IsAuthenticated]
-    model = Book
-    serializer_class = BookSerializer
-    template_name = 'api_book_detail.html'
-    renderer_classes = [TemplateHTMLRenderer]
 
-    def get(self, request, pk):
-        queryset = Book.objects.get(pk=pk)
-        print(queryset)
-        return Response({"book": queryset})
+# class BookDetailAPI(APIView):
+#     authentication_classes = [TokenAuthentication, SessionAuthentication]
+#     permission_classes = [IsAuthenticated]
+#     model = Book
+#     serializer_class = BookSerializer
+#     template_name = 'api_book_detail.html'
+#     renderer_classes = [TemplateHTMLRenderer]
 
-    def post(self, request, pk):
+#     def get(self, request, pk):
+#         queryset = Book.objects.get(pk=pk)
+#         print(queryset)
+#         return Response({"book": queryset})
+
+#     def post(self, request, pk):
+#         book = Book.objects.get(pk=pk)
+#         subject = f"Request for details of {book.title} - Social Book"
+#         message = f'Here is your requested information\nBook Name: {book.title}\nDescription: {book.description}\nAuthor: {book.author.get_fullname}\nPublished Date: {book.published_date}\nCost: {book.cost}'
+#         from_email = settings.EMAIL_HOST_USER
+#         to_email = [request.user.email]
+#         try:
+#             send_mail(subject, message, from_email, recipient_list=to_email)
+#             messages.success(request, "Book details been sent, check your email")
+#         except Exception:
+#             messages.error(request, "Error sending email try again later")
+#         return redirect('book-detail-api', pk=book.pk)
+
+@api_view(['GET', 'POST'])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+@permission_classes([IsAuthenticated])
+@renderer_classes([TemplateHTMLRenderer])
+def book_detail_api(request, pk):
+
+    if request.method == "GET":
+        book = Book.objects.get(pk=pk)
+        return Response({"book": book}, template_name='api_book_detail.html')
+    
+    if request.method == "POST":
         book = Book.objects.get(pk=pk)
         subject = f"Request for details of {book.title} - Social Book"
         message = f'Here is your requested information\nBook Name: {book.title}\nDescription: {book.description}\nAuthor: {book.author.get_fullname}\nPublished Date: {book.published_date}\nCost: {book.cost}'
@@ -230,7 +254,6 @@ def send_details(request):
         messages.error(request, "Error sending email try again later")
     return redirect('home')
 
-from django.http import HttpResponse
 def generate_2fa():
     digits = string.digits
     two_fa = ''
