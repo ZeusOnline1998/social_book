@@ -26,6 +26,7 @@ urlpatterns = [
     # path('auth/', include('djoser.urls')),
     # path('auth/', include('djoser.urls.authtoken')),
     # path('auth-token/', TokenCreateView.as_view()),
+    # url(r'^auth/', include('djoser.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

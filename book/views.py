@@ -75,19 +75,82 @@ def login_user(request):
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
             user = authenticate(username=username, password=password)
+            if user:
+                data_user = CustomUser.objects.get(username=username)
+                otp = generate_2fa()
+                request.session['username'] = username
+                request.session['password'] = password
+                print(request.session['username'], request.session['password'])
+                print(type(username), type(password), type(otp))
+                request.session['otp'] = otp
+                subject = "Two factor authentication for login - Social Book"
+                message = f'Here is your Two factor authentication required to login.\nPlease do not share it with others\nCode: {otp}'
+                from_email = settings.EMAIL_HOST_USER
+                to_email = [data_user.email]
+                send_mail(subject, message, from_email, to_email)
+                try:
+                    Token.objects.get(user=user)
+                    token = Token.objects.get(user=user)
+                except Exception:
+                    create_token = TokenCreateView.as_view()
+                    token = create_token(request)
+                # token = Token.objects.create(user=user)
+                # print(token)
+                # print(type(token))
+                # print(token.key)
+                # print(type(token.key))
+                return redirect('check-otp')
+                # if check_otp(request, user):
+                #     create_token = TokenCreateView.as_view()
+                #     token = create_token(request)
+                #     login(request, user)
+                #     messages.success(request, f"Welcome {request.user.get_fullname}!")
+                #     return redirect('home')
+                # else:
+                #     messages.error(request, "Two didnt match with our records please try again")
+                #     return redirect('login')
             # token = Token.objects.get_or_create(user=user)
-            create_token = TokenCreateView.as_view()
-            token = create_token(request)
-            print(token)
-            if user is not None:
-                login(request, user)
-                messages.success(request, f"Welcome {request.user.get_fullname}!")
-                return redirect('home')
-            else:
-                messages.error(request, "Invalid Credentials, Please try again")
+            # print(token)
+            # if user is not None:
+            #     login(request, user)
+            # else:
+            #     messages.error(request, "Invalid Credentials, Please try again")
     form = UserLoginForm()
     return render(request, 'login.html', {"form": form})
 
+def generate_2fa():
+    digits = string.digits
+    two_fa = ''
+    for _ in range(6):
+        two_fa += random.choice(digits)
+    print(two_fa)
+    return two_fa
+
+def check_otp(request):
+    if request.method == 'POST':
+        otp = request.POST['otp'].strip()
+        if otp == request.session['otp']:
+            username = request.session['username']
+            password = request.session['password']
+            user = authenticate(username=username, password=password)
+            login(request, user)
+            messages.success(request, f"Welcome {request.user.get_fullname}!")
+            return redirect('home')
+        else:
+            messages.error(request, "Authentication code didnt match with our records. Please try again")
+            return redirect('check-otp')
+    return render(request, 'two_factor.html')
+
+@login_required
+def logout_user(request):
+    token = Token.objects.get(user=request.user)
+    # destroy_token = TokenDestroyView.as_view()
+    # token = destroy_token(request)
+    # print(token)
+    # print(token)
+    logout(request)
+    token.delete()
+    return redirect('home')
 
 
 # class LoginAPI(CreateAPIView):
@@ -108,16 +171,6 @@ def login_user(request):
 #             login(request, user)
 #             return redirect('home')
 
-@login_required
-def logout_user(request):
-    token = Token.objects.get(user=request.user)
-    # destroy_token = TokenDestroyView.as_view()
-    # token = destroy_token(request)
-    print(token)
-    # print(token)
-    logout(request)
-    token.delete()
-    return redirect('home')
 
 @method_decorator(login_required, name='dispatch')
 class UploadBookView(CreateView):
@@ -254,9 +307,4 @@ def send_details(request):
         messages.error(request, "Error sending email try again later")
     return redirect('home')
 
-def generate_2fa():
-    digits = string.digits
-    two_fa = ''
-    for _ in range(6):
-        two_fa += random.choice(digits)
-    return two_fa
+

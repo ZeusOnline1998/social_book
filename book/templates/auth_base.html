@@ -33,7 +33,6 @@
 		gtag('config', 'UA-119386393-1');
 	</script>
 </head>
-
 {% if messages %}
 					{% for message in messages %}
 						{% if message.tags == 'success' %}
@@ -53,7 +52,9 @@
 						{% endif %}
 					{% endfor %}
 				{% endif %}
+
 	{% block body %}
+	
 	{% endblock body %}
 	<!-- js -->
 	<script src="{% static 'js/core.js' %}"></script>

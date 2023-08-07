@@ -160,9 +160,10 @@ LOGIN_URL = 'login'
 
 LOGOUT_URL = 'logout'
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'zeusonline1998@gmail.com'
-EMAIL_HOST_PASSWORD = 'mwiegumrcdxhlulw'
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = 'zeusonline1998@gmail.com'
+# EMAIL_HOST_PASSWORD = 'mwiegumrcdxhlulw'

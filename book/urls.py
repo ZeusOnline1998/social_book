@@ -21,4 +21,5 @@ urlpatterns = [
     # path('generate/', views.generate, name='generate'),
     # path('api/book/<int:pk>/', views.BookDetailAPI.as_view(), name='book-detail-api'),
     path('api/book/<int:pk>/', views.book_detail_api, name='book-detail-api'),
+    path('two-factor-authentication/', views.check_otp, name='check-otp'),
 ]
